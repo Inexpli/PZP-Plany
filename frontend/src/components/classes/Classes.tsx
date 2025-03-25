@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {getGroups} from "@/components/classes/GroupSelector.ts";
 import {University} from "../../../types/University.ts";
-import {getStudyTypeLabel, getStudyTypes} from "@/components/classes/StudyTypeSelector.ts";
+import {getStudyTypeForGroups, getStudyTypeLabel, getStudyTypes} from "@/components/classes/StudyTypeSelector.ts"; // Zaimportowanie nowej funkcji
 
 type ClassesProps = {
     propCatedral: string;
@@ -29,7 +29,8 @@ export const Classes = ({
 
     Object.entries(zajecia).forEach(([nauczyciel, zajeciaList]) => {
         zajeciaList.forEach((zaj) => {
-            const studyType = zaj.groups.length ? getStudyTypes().find(type => zaj.groups.some(g => g.includes(`/${type}/`))) ?? "S" : "S";
+            const studyType = getStudyTypeForGroups(zaj.groups); // Teraz korzystamy z funkcji w StudyTypeSelector.ts
+
             if (selectedType && studyType === selectedType) {
                 const groups = getGroups(zaj.groups);
                 groups.forEach(group => availableGroups.add(group));
@@ -53,6 +54,7 @@ export const Classes = ({
             </div>
             {isOpen && (
                 <div className="p-6 flex flex-col items-center">
+                    {/* Logika do wyboru trybu studiów */}
                     <div className="flex gap-4 mb-4">
                         {getStudyTypes().map((type) => (
                             <button key={type}
@@ -65,6 +67,7 @@ export const Classes = ({
                             </button>
                         ))}
                     </div>
+
                     {selectedType && availableGroups.size > 0 && (
                         <div className="flex gap-4 mb-4">
                             {[...availableGroups].map((group) => (
@@ -76,6 +79,7 @@ export const Classes = ({
                             ))}
                         </div>
                     )}
+
                     {selectedType && Object.keys(groupedBySubject).length > 0 ? (
                         <div className="grid grid-cols-2 gap-6">
                             {Object.entries(groupedBySubject).map(([subject, teachers]) => (
